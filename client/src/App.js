@@ -3,6 +3,7 @@ import axios from 'axios';
 import './styles.css';
 
 function App() {
+  const API_BASE_URL = 'https://csv-data-09lr.onrender.com';
   const [selectedFile, setSelectedFile] = useState(null);
   const [tableData, setTableData] = useState(null);
   const [rowsToDisplay, setRowsToDisplay] = useState(10);
@@ -37,7 +38,7 @@ function App() {
     try {
       // Call your PUT endpoint with the updated data
       const response = await axios.put(
-        `http://localhost:5000/records/${recordId}`,
+        `${API_BASE_URL}/records/${recordId}`,
         editFormData
       );
   
@@ -72,7 +73,7 @@ function App() {
     formData.append('csvFile', selectedFile);
 
     try {
-      const response = await axios.post('http://localhost:5000/upload', formData, {
+      const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -88,7 +89,7 @@ function App() {
   // Fetch records from MongoDB
   const fetchRecords = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/records');
+      const response = await axios.get(`${API_BASE_URL}/records`);
       setTableData(response.data);
     } catch (error) {
       console.error(error);
