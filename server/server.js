@@ -12,7 +12,7 @@ app.use(fileUpload());
 app.use(express.json());
 
 // Connect to MongoDB
-const mongoURI = process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/csvDataDB';
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
