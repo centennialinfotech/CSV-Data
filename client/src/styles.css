@@ -1,52 +1,129 @@
+/* client/src/styles.css */
+
 .container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    max-width: 90%;
-    margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 95%;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.upload-button,
+.fetch-button,
+.save-button,
+.edit-button,
+.delete-button {
+  margin-left: 10px;
+  padding: 5px 15px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.fetch-button {
+  background-color: #2196f3;
+}
+
+.edit-button {
+  background-color: #ff9800;
+}
+
+.delete-button {
+  background-color: #f44336;
+}
+
+.save-button {
+  background-color: #4caf50;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 800px;
+  text-align: left;
+  table-layout: fixed; /* Ensures fixed table layout */
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  word-wrap: break-word;
+}
+
+.table th {
+  background-color: #f2f2f2;
+}
+
+/* Style for the Email column */
+.email-column {
+  width: 200px; /* Adjust this value as needed */
+  white-space: nowrap; /* Prevents text from wrapping */
+  overflow: hidden; /* Hides overflow text */
+  text-overflow: ellipsis; /* Adds "..." for overflow text */
+}
+
+/* Style for the Actions column */
+.actions-column {
+  width: 150px;
+  text-align: center;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .email-column {
+    width: 150px;
   }
-  
-  .title {
-    text-align: center;
+
+  .actions-column {
+    width: 100px;
   }
-  
-  .upload-section {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .upload-button,
-  .fetch-button {
-    margin-left: 10px;
-    padding: 5px 15px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .fetch-button {
-    background-color: #2196f3;
-  }
-  
-  .table-wrapper {
-    overflow-x: auto;
-    margin-top: 20px;
-  }
-  
+
   .table {
-    border-collapse: collapse;
-    width: 100%;
     min-width: 600px;
-    text-align: left;
   }
-  
-  .table th,
-  .table td {
-    padding: 10px;
-    border: 1px solid #ddd;
+}
+
+@media (max-width: 480px) {
+  .email-column {
+    width: 120px;
   }
-  
-  .table th {
-    background-color: #f2f2f2;
-  }  
+
+  .actions-column {
+    width: 80px;
+  }
+
+  .table {
+    min-width: 400px;
+  }
+
+  .upload-button,
+  .fetch-button,
+  .save-button,
+  .edit-button,
+  .delete-button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}

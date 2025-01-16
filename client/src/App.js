@@ -1,14 +1,16 @@
+// client/src/App.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import './styles.css';
 
 function App() {
-  const API_BASE_URL = 'https://csv-data-09lr.onrender.com';
   const [selectedFile, setSelectedFile] = useState(null);
-  const [tableData, setTableData] = useState(null);
+  const [tableData, setTableData] = useState([]);
   const [rowsToDisplay, setRowsToDisplay] = useState(10);
   const [editingRowId, setEditingRowId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+
+  const API_BASE_URL = 'https://csv-data-09lr.onrender.com'; // Deployed backend URL
 
   const editableFields = [
     'Status',
@@ -20,42 +22,6 @@ function App() {
     'Accepted Offer Letter',
     'Candidates Enrolled'
   ];
-  
-  // Triggered when user clicks "Edit"
-  const handleEditClick = (record) => {
-    setEditingRowId(record._id);
-    setEditFormData(record); // copy existing row data into editFormData
-  };
-
-  const handleInputChange = (e, key) => {
-    setEditFormData({
-      ...editFormData,
-      [key]: e.target.value
-    });
-  };
-  
-  const handleSaveClick = async (recordId) => {
-    try {
-      // Call your PUT endpoint with the updated data
-      const response = await axios.put(
-        `${API_BASE_URL}/records/${recordId}`,
-        editFormData
-      );
-  
-      // Update tableData in state:
-      // Replace the old row with the new updated row
-      setTableData((prevData) =>
-        prevData.map((item) => (item._id === recordId ? response.data : item))
-      );
-  
-      // Exit edit mode
-      setEditingRowId(null);
-    } catch (error) {
-      console.error(error);
-      alert('Error updating record.');
-    }
-  };
-  
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -80,6 +46,7 @@ function App() {
       });
 
       alert(response.data.message); // Show success message
+      fetchRecords(); // Refresh the table data
     } catch (error) {
       console.error(error);
       alert('An error occurred while uploading the file.');
@@ -97,6 +64,49 @@ function App() {
     }
   };
 
+  // Handle edit button click
+  const handleEditClick = (record) => {
+    setEditingRowId(record.id); // Assuming 'id' is the unique identifier
+    setEditFormData(record);
+  };
+
+  // Handle input changes in edit mode
+  const handleInputChange = (e, fieldName) => {
+    setEditFormData({
+      ...editFormData,
+      [fieldName]: e.target.value
+    });
+  };
+
+  // Handle save button click
+  const handleSaveClick = async (recordId) => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/records/${recordId}`, editFormData);
+      // Update tableData with the updated record
+      setTableData((prevData) =>
+        prevData.map((record) => (record.id === recordId ? response.data : record))
+      );
+      setEditingRowId(null); // Exit edit mode
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while updating the record.');
+    }
+  };
+
+  // Handle delete button click
+  const handleDeleteClick = async (recordId) => {
+    if (!window.confirm('Are you sure you want to delete this record?')) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/records/${recordId}`);
+      // Remove the deleted record from tableData
+      setTableData((prevData) => prevData.filter((record) => record.id !== recordId));
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while deleting the record.');
+    }
+  };
+
   return (
     <div className="container">
       <h1 className="title">MERN CSV Upload with MongoDB</h1>
@@ -111,7 +121,7 @@ function App() {
         </button>
       </div>
 
-      {tableData && (
+      {tableData.length > 0 && (
         <div>
           <div className="row-input-section">
             <label htmlFor="rowsToDisplay">
@@ -131,42 +141,48 @@ function App() {
               <thead>
                 <tr>
                   {Object.keys(tableData[0]).map((key, idx) => (
-                    <th key={idx}>{key}</th>
+                    <th key={idx} className={key === 'Email' ? 'email-column' : ''}>
+                      {key}
+                    </th>
                   ))}
+                  <th className="actions-column">Actions</th>
                 </tr>
               </thead>
               <tbody>
-  {tableData.slice(0, rowsToDisplay).map((row, rowIndex) => (
-    <tr key={rowIndex}>
-      {Object.keys(row).map((key, cellIndex) => {
-        // If we are currently editing this row and the column is in our editable list:
-        if (editingRowId === row._id && editableFields.includes(key)) {
-          return (
-            <td key={cellIndex}>
-              <input
-                value={editFormData[key] || ''} // the updated text
-                onChange={(e) => handleInputChange(e, key)}
-              />
-            </td>
-          );
-        } else {
-          // Otherwise, just display the value as read-only text
-          return <td key={cellIndex}>{row[key]}</td>;
-        }
-      })}
-
-      {/* Edit/Save button cell */}
-      <td>
-        {editingRowId === row._id ? (
-          <button onClick={() => handleSaveClick(row._id)}>Save</button>
-        ) : (
-          <button onClick={() => handleEditClick(row)}>Edit</button>
-        )}
-      </td>
-    </tr>
-  ))}
-</tbody>
-
+                {tableData.slice(0, rowsToDisplay).map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Object.entries(row).map(([key, value], cellIndex) => (
+                      <td key={cellIndex} className={key === 'Email' ? 'email-column' : ''}>
+                        {editingRowId === row.id && editableFields.includes(key) ? (
+                          <input
+                            type="text"
+                            value={editFormData[key] || ''}
+                            onChange={(e) => handleInputChange(e, key)}
+                          />
+                        ) : (
+                          value
+                        )}
+                      </td>
+                    ))}
+                    <td className="actions-column">
+                      {editingRowId === row.id ? (
+                        <button onClick={() => handleSaveClick(row.id)} className="save-button">
+                          Save
+                        </button>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEditClick(row)} className="edit-button">
+                            Edit
+                          </button>
+                          <button onClick={() => handleDeleteClick(row.id)} className="delete-button">
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>
