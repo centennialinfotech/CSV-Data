@@ -45,7 +45,7 @@ app.post('/upload', async (req, res) => {
 // Fetch all records from MongoDB
 app.get('/records', async (req, res) => {
   try {
-    const records = await CsvRecord.find();
+    const records = await CsvRecord.find().select('-_id -__v');
     res.json(records);
   } catch (error) {
     console.error(error);
